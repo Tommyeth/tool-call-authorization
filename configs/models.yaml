@@ -1,0 +1,80 @@
+# 跨 family 验证需要至少 Qwen + 一个非 Qwen（§6：避免 Qwen artifact）。
+#
+# action_first_tokens: 一次 tool call 生成时的**首 token** 候选字符串。
+#   logit lens 读的就是这些 token 在第 l 层的概率和 —— 即 A_l。
+#   留空则由 modeling.resolve_action_markers() 在 L0 样本上实测自动推断（推荐，
+#   config 里的值只作为 fallback / 断言对照）。
+
+defaults:
+  dtype: bfloat16
+  device: cuda
+  max_new_tokens: 128
+
+models:
+  qwen-7b:
+    hf_id: Qwen/Qwen2.5-7B-Instruct
+    family: qwen
+    supports_system_role: true
+    supports_tools_in_template: true
+    action_first_tokens: ["<tool_call>"]
+
+  qwen-14b:
+    hf_id: Qwen/Qwen2.5-14B-Instruct
+    family: qwen
+    supports_system_role: true
+    supports_tools_in_template: true
+    action_first_tokens: ["<tool_call>"]
+
+  # 官方 Llama / Gemma 需要在 HF 上申请 gated 访问并配置 HF_TOKEN。
+  llama-8b:
+    hf_id: meta-llama/Llama-3.1-8B-Instruct
+    family: llama
+    gated: true
+    supports_system_role: true
+    supports_tools_in_template: true
+    action_first_tokens: ["<|python_tag|>", "{\""]
+
+  # 免 gating 的跨 family 替代，已实测可拉取且 marker 为单 token。
+  # hermes-8b 用的是 Llama-3.1 预训练底座（可检验"非 Qwen 表征"是否成立），
+  # 但指令调优来自 Nous，行为层面与 Meta 官方 Instruct 会有差别——论文需写明。
+  hermes-8b:
+    hf_id: NousResearch/Hermes-3-Llama-3.1-8B
+    family: llama
+    supports_system_role: true
+    supports_tools_in_template: true
+    action_first_tokens: ["<tool_call>"]        # id 128002，单 token
+
+  # Mistral 是真正独立的预训练族，证伪 Qwen artifact 的力度最强。
+  mistral-7b:
+    hf_id: mistralai/Mistral-7B-Instruct-v0.3
+    family: mistral
+    supports_system_role: false                 # v0.3 模板无 system role
+    supports_tools_in_template: true
+    action_first_tokens: ["[TOOL_CALLS]"]       # id 5，单 token
+
+  gemma-9b:
+    hf_id: google/gemma-2-9b-it
+    family: gemma
+    gated: true
+    # gemma-2 的 chat template 既不支持 system role 也不支持 tools，
+    # prompts.render_chat() 会把 tool spec 折叠进第一条 user turn。
+    supports_system_role: false
+    supports_tools_in_template: false
+    action_first_tokens: ["```"]
+    # 必需：soft-capped attention 与 SDPA/FlashAttention 不兼容
+    attn_implementation: eager
+
+  # 诊断用：同一个 Llama，但绕开其原生 template。
+  # Llama-3.1 的 tools 模板在 user turn 里注入 "please respond with a JSON for a
+  # function call"——一条强制调用指令，会顶掉 system 里的"仅在被要求时调用"。
+  # 实测原生模板下 FAR=0.996（各 level 均 ~1.0），衡量的是模板措辞而非授权判断。
+  # 本条改用 prompts._tools_as_text 的中性渲染，与 gemma 同一套，用于分离
+  # "模型的授权理解" 与 "模板诱发的 call bias"。
+  llama-8b-neutral:
+    hf_id: meta-llama/Llama-3.1-8B-Instruct
+    family: llama
+    gated: true
+    supports_system_role: true
+    supports_tools_in_template: false
+    action_first_tokens: ["```"]
+

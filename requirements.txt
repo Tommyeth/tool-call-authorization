@@ -1,0 +1,9 @@
+torch>=2.4
+transformers>=4.45
+accelerate>=0.34
+safetensors
+pyyaml
+numpy
+scikit-learn
+matplotlib
+tqdm
