@@ -19,7 +19,9 @@ Key steps: `24_nested_transfer.py` (audit-to-action transfer with audit-only lay
 `25_paired_holdout.py` and `32_matched_input_text_baseline.py` (construction hold-outs and text
 baselines), `27_revision_factorial.py` / `28_factorial_revision_stats.py` (instruction grid and
 paired seed-bootstrap contrasts; `--max-new-tokens` sets the budget), `33_audit_cache_with_ids.py`
-(ID-embedded hidden-state extraction), `35`–`37` (activation intervention with equal-norm controls).
+(ID-embedded hidden-state extraction), `35`–`37` (activation intervention with equal-norm controls), `39_revision_controls.py`
+(text baselines and shuffled-label control for audit-to-action transfer, zero-shot audit judgment on
+construction folds, and steering shift size).
 
 ## Setup
 
