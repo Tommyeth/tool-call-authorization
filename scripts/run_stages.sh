@@ -6,13 +6,14 @@
 
 set -uo pipefail
 cd "$(dirname "$0")/.." || exit 1
-source /venv/main/bin/activate
+# Activate a virtualenv by setting VENV to its activate script; skip when already inside one.
+[ -n "${VENV:-}" ] && source "$VENV"
 export HF_HOME=${HF_HOME:-$HOME/.cache/huggingface}
 export TOKENIZERS_PARALLELISM=false
 
 MODEL=${1:-qwen-7b}; shift
 STAGES=("$@")
-ITEMS=${ITEMS:-data/pairs/pilot_v1.jsonl}
+ITEMS=${ITEMS:-data/pairs/pilot_v2.jsonl}
 RUN_DIR=${RUN_DIR:-runs/${MODEL}}
 LOG="${RUN_DIR}.log"
 mkdir -p "$RUN_DIR"
