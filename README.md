@@ -4,8 +4,9 @@ Research code for probing whether language models represent *authorization* (a u
 action versus merely discussing it) and how tool-calling behaviour depends on instruction wording,
 placement, and generation budget.
 
-This repository contains the core experiment and analysis code only. Data, model outputs, cached
-hidden states, figure scripts, and manuscript files are not included.
+This repository contains the core experiment and analysis code together with the 400-item set the
+experiments run on. Model outputs, cached hidden states, figure scripts, and manuscript files are
+not included.
 
 ## Layout
 
@@ -14,6 +15,8 @@ hidden states, figure scripts, and manuscript files are not included.
 | `src/icaa/` | Item schema, prompt rendering, model loading, forward passes, probing, rollout parsing |
 | `scripts/` | Numbered experiment and analysis steps and two shell runners |
 | `configs/models.yaml` | Model identifiers and chat-template settings |
+| `data/pairs/pilot_v2.jsonl` | The 400 items: 40 action seeds x 5 speech-act levels x 2 request forms, with the tool call and arguments held fixed within a seed |
+| `data/actions.yaml` | The ten tool schemas and their risk tiers |
 
 Key steps: `24_nested_transfer.py` (audit-to-action transfer with audit-only layer selection),
 `25_paired_holdout.py` and `32_matched_input_text_baseline.py` (construction hold-outs and text
@@ -29,8 +32,9 @@ construction folds, and steering shift size).
 pip install -r requirements.txt
 ```
 
-Scripts expect the item file at `data/pairs/pilot_v2.jsonl`, action schemas at `data/actions.yaml`,
-and write to `runs/`. Gated checkpoints need Hugging Face access configured in your environment
+Scripts read the item file at `data/pairs/pilot_v2.jsonl` and the action schemas at
+`data/actions.yaml`, and write to `runs/`. All items are synthetic English text; names, paths, and
+email addresses in the tool arguments are invented placeholders. Gated checkpoints need Hugging Face access configured in your environment
 (for example `huggingface-cli login`); no credentials are stored here.
 
 All model tool calls are generated text proposals; no tool is executed.

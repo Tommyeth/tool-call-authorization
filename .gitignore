@@ -2,7 +2,11 @@ __pycache__/
 *.pyc
 .DS_Store
 runs/
-data/
+data/*
+!data/actions.yaml
+!data/pairs/
+data/pairs/*
+!data/pairs/pilot_v2.jsonl
 paper/
 release/
 compute/
