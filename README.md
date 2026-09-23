@@ -24,7 +24,9 @@ baselines), `27_revision_factorial.py` / `28_factorial_revision_stats.py` (instr
 paired seed-bootstrap contrasts; `--max-new-tokens` sets the budget), `33_audit_cache_with_ids.py`
 (ID-embedded hidden-state extraction), `35`–`37` (activation intervention with equal-norm controls), `39_revision_controls.py`
 (text baselines and shuffled-label control for audit-to-action transfer, zero-shot audit judgment on
-construction folds, and steering shift size).
+construction folds, and steering shift size), `40_parser_rule_check.py`
+(re-parses the archived grids under a stricter first-complete-object rule and reports where it
+disagrees with the endpoint parser).
 
 ## Setup
 
